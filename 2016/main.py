@@ -15,9 +15,25 @@ class SuperClass:
 
 
 # class defs
-class Class(SuperClass):
-    def __init__(self):
+class Satellite(SuperClass):
+    def __init__(self, id, lat, lon, v, max_orientation_change, max_orientation):
         super().__init__()
+        self.id = id
+        self.lat = lat
+        self.lon = lon
+        self.v = v
+        self.max_orientation_change = max_orientation_change
+        self.max_orientation = max_orientation
+
+
+class Collection(SuperClass):
+    def __init__(self, value, lats, lons, starts, ends):
+        super().__init__()
+        self.starts = starts
+        self.lons = lons
+        self.lats = lats
+        self.ends = ends
+        self.value = value
 
 
 # functions
@@ -30,10 +46,11 @@ def read_in(in_file_name):
             elements = line.replace("\n", "").split(delimiter)
 
             # convert numeric input
-            elements = [float(e) if e.count(".") <= 1 and e.replace(".", "").replace("-", "").isnumeric() else e for e in elements]
+            elements = [float(e) if e.count(".") <= 1 and e.replace(".", "").replace("-", "").isnumeric() else e for e
+                        in elements]
             elements = [int(e) if type(e) is float and e.is_integer() else e for e in elements]
 
-            print(", ".join(f"{type(e).__name__}={e}" for e in elements))
+            # print(", ".join(f"{type(e).__name__}={e}" for e in elements))
 
             if len(elements) > 1:
                 inputs.append(elements)
@@ -61,8 +78,10 @@ for in_file_name in in_file_names:
 
     in_data = read_in(in_file_name)
 
+
     def pop():
         return in_data.pop(0)
+
 
     header = pop()
 
@@ -71,15 +90,40 @@ for in_file_name in in_file_names:
     else:
         print("header:", f"{type(header).__name__}={header}")
 
-    LIST_OF_VARIABLES = header
+    num_turns = header
 
-    sorted_objects = []
+    num_satellites = pop()
 
-    for elements in in_data:
-        sorted_objects.append(Class(*elements))
+    satellites = []
 
-    # sort objects by their weight in descending order
-    sorted_objects.sort(key=lambda x: x.weight(), reverse=True)
+    for s_i in range(num_satellites):
+        lat, lon, v, w, d = pop()
+        satellites.append(Satellite(s_i, lat, lon, v, w, d))
+
+        print(satellites[-1])
+
+    num_collections = pop()
+
+    collections = []
+
+    for c_i in range(num_collections):
+        V, L, R = pop()
+
+        lats, lons = [], []
+        for _ in range(L):
+            lat, lon = pop()
+            lats.append(lat)
+            lons.append(lon)
+
+        starts, ends = [], []
+        for _ in range(R):
+            start, end = pop()
+            starts.append(start)
+            ends.append(ends)
+
+        collections.append(Collection(V, lats, lons, starts, ends))
+
+        print(collections[-1])
 
     out_data = []
 
